@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Slot Booking</title>
+    <style>
+        body {
+            background: url("https://img.freepik.com/free-vector/network-connection-background-gradient_23-2148879893.jpg") no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: aqua;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .parking-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* Adjust the number of columns as needed */
+            gap: 10px;
+        }
+
+        .parking-slot {
+            width: 100px;
+            height: 100px; /* Adjust the height as needed */
+            background-color: #4CAF50; /* Default color */
+            border: 1px solid #e8b5b5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #214272;
+            transition: background-color 0.3s;
+        }
+
+        .parking-slot.booked {
+            background-color: #FF0000; /* Red color for booked slots */
+            pointer-events: none; /* Disable pointer events for booked slots */
+        }
+
+        #availability {
+            margin-top: 20px;
+            font-weight: bold;
+            color: aqua;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Parking Slot Booking</h2>
+
+<div id="availability"></div>
+
+<div class="parking-container" id="parkingContainer">
+    <!-- Create parking slots dynamically using JavaScript -->
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Number of parking slots and columns
+        const totalSlots = 25; // Change this number based on your requirement
+
+        // Get the parking container element
+        const parkingContainer = document.getElementById("parkingContainer");
+        const availabilityDiv = document.getElementById("availability");
+
+        // Initialize the availability paragraph
+        const paragraph = document.createElement('p');
+        paragraph.textContent = `Total Slots: ${totalSlots} | Available Slots: ${totalSlots}`;
+        availabilityDiv.appendChild(paragraph);
+
+        // Create parking slots dynamically
+        for (let i = 1; i <= totalSlots; i++) {
+            const slot = document.createElement("div");
+            slot.classList.add("parking-slot");
+            slot.dataset.slotNumber = i;
+            slot.addEventListener("click", toggleBooking);
+            slot.textContent = i; // Display slot number
+            parkingContainer.appendChild(slot);
+        }
+
+        // Function to toggle booking status on click
+        function toggleBooking(event) {
+            const slot = event.target;
+            if (!slot.classList.contains("booked")) {
+                slot.classList.add("booked");
+                console.log(`Slot ${slot.dataset.slotNumber} booked.`);
+            } else {
+                alert("This slot is already booked. Please choose another slot.");
+            }
+
+            updateAvailability();
+        }
+
+        // Function to update availability status
+        function updateAvailability() {
+            const bookedSlots = document.querySelectorAll(".parking-slot.booked");
+            const availableSlots = totalSlots - bookedSlots.length;
+            paragraph.textContent = `Total Slots: ${totalSlots} | Available Slots: ${availableSlots}`;
+
+            // If there are booked slots, add a link to the paragraph
+            if (bookedSlots.length > 0) {
+                const link = document.createElement('a');
+                link.href = 'https://maps.app.goo.gl/4Yj17fvkyGEXn6Y67'; // Replace 'your-link-url' with the actual URL
+                link.textContent = 'Directions to destination';
+                paragraph.appendChild(document.createTextNode(' | '));
+                paragraph.appendChild(link);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
