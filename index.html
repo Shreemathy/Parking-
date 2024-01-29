@@ -1,209 +1,233 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
-	<!-- Bootstrap theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-	<title>Authentication</title>
-	<style>
-		body {
-			font-family: 'Arial', sans-serif;
-			background-color: #c35353;
-
-	
-			background-image:"https://img.freepik.com/free-vector/network-connection-background-gradient_23-2148879893.jpg";
-			
-			border: none;
-			color: #171616;
-			padding: 15px 20px;
-			margin-bottom: 20px;
-		}
-
-		.navbar h1 {
-			margin: 0;
-			padding: 0;
-			font-size: 24px;
-			font-weight: bold;
-		}
-
-		.container {
-			margin-top: 20px;
-		}
-
-		.form-group {
-			margin-bottom: 20px;
-		}
-
-		.btn-success {
-			background-color: #5cb85c;
-			color: #ffffff;
-			border: none;
-		}
-
-		#logout {
-			color: #ffffff;
-		}
-
-		#logout:hover {
-			text-decoration: underline;
-		}
-	</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoJSON Multiple Places</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 500px;
+    }
+    .label {
+      background-color: white;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
 
-<!-- <div class="navbar navbar-default">
-<div class="navbar-header"> -->
-  <h1>SIGNUP-LOGIN</h1>>
-  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false" aria-controls="navbar">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-  </button>
-</div>
-<div class="navbar-collapse collapse"  >
-    <ul class="nav navbar-nav navbar-right">
-         <li><a href="#" id="logout" style="display: none;">Log Out</a></li>
-    </ul>
-</div>
-</div>
-<br>
-<div class="container">	
-  <form name="registration_form" id="registration_form" method="post" action="#" enctype="multipart/form-data" >
-  <div class="row">
+<div id="map"></div>
 
-	<div class="col-sm-4">
-		<div class="form-group">
-	      <label for="email">Email</label>
-		  <input type="text" name="email" id="email" class="form-control" placeholder="Enter your email">
-		</div>
-		
-		<div class="form-group">
-	      <label for="password" >Password</label>
-		  <input type="password" name="password" id="password" class="form-control"  placeholder="Enter your password">
-		</div>
-		<button type="button" id="register" name="register" class="btn btn-success">Signup</button>
-	</div><!-- end col -->
-	</form>
-	<form name="login_form" id="login_form" method="post" action="#" enctype="multipart/form-data" >
-	<div class="col-sm-4">
-		<div class="form-group">
-	      <label for="email">Email</label>
-		  <input type="text" name="login_email" id="login_email" class="form-control" placeholder="Enter your email">
-		</div>
-		
-		<div class="form-group">
-	      <label for="password">Password</label>
-		  <input type="password" name="login_password" id="login_password" class="form-control"  placeholder="Enter your password">
-		</div>
-		<button type="button" id="login" name="login" class="btn btn-success">Login</button>
-	</div><!-- end col -->
-	
-  </div><!--  end row -->		
-  </form>
-</div>
-<br>
-</body>
-	<script type="module">
-	  // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-analytics.js";
-	  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
-     
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+ var map = L.map('map').setView([11.0055, 76.9552], 14);  // Centered around Peelamedu coordinates
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyDl21F93MaSZVGfj68yF5TLuwvLD3VtIjw",
-    authDomain: "parkingsys-2d45a.firebaseapp.com",
-    projectId: "parkingsys-2d45a",
-    storageBucket: "parkingsys-2d45a.appspot.com",
-    messagingSenderId: "908135030897",
-    appId: "1:908135030897:web:7577295919ddb91270bbd0",
-    measurementId: "G-D4PT63EYZY"
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+  var placesGeoJSON = {
+    "type": "FeatureCollection",
+    "features": [
+      // Saravanampatti and Subzones
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [76.9812, 11.0815]  // Saravanampatti coordinates
+        },
+        "properties": {
+          "name": "Saravanampatti",
+          "message": "Saravanampatti area in Coimbatore"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [76.977, 11.081]  // Prozone Mall coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "Prozone Mall",
+          "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:10<br>FACILITIES:Tea/Coffee,Biscuits,Juice<br>TO BOOK SLOTS:"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [76.984, 11.083]  // Echanari Temple coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "Echanari Temple",
+          "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:15<br>FACILITIES:Tea/Coffee,Biscuits,Juice<br>TO BOOK SLOTS:"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [76.977, 11.076]  // Kovai Kutralam coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "Kovai Kutralam",
+          "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:10<br>FACILITIES:Tea/Coffee,Biscuits,Juice<br>TO BOOK SLOTS:"
+        }
+      },
+      // Ukkadam and Subzones
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [76.9646, 11.0117]  // Ukkadam coordinates
+        },
+        "properties": {
+          "name": "Ukkadam",
+          "message": "Center location in Coimbatore"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [76.961, 11.008]  // Ukkadam Lake coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "Ukkadam Lake",
+          "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:20<br>FACILITIES:Tea/Coffee,Snacks,CoolDrinks<br>TO BOOK SLOTS:"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [76.967, 11.010]  // Sungam Lake coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "Sungam Lake",
+          "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:20<br>FACILITIES:Tea/Coffee,Snacks,CoolDrinks<br>TO BOOK SLOTS:"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [76.958, 11.014]  // Coimbatore Junction coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "Coimbatore Junction",
+          "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:20<br>FACILITIES:Tea/Coffee,Snacks,CoolDrinks<br>TO BOOK SLOTS:"
+        }
+      },
+      // Peelamedu and Subzones
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [77.0245, 11.0304]  // Peelamedu coordinates
+        },
+        "properties": {
+          "name": "Peelamedu",
+          "message": "Peelamedu area in Coimbatore"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [77.027, 11.033]  // PSG Hospital coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "PSG Hospital",
+          "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:30<br>FACILITIES:Tea/Coffee<br>TO BOOK SLOTS:"
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [77.026, 11.029]  // FunMall coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "FunMall",
+         // "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:20<br>FACILITIES:Tea/Coffee,CoolDrinks<br>TO BOOK SLOTS:<href>http://127.0.0.1:5500/Parking.html</href>"
+         "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:20<br>FACILITIES:Tea/Coffee,CoolDrinks<br>TO BOOK SLOTS: <a href='http://127.0.0.1:5500/Parking.html'>Click here</a>"
+
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [77.028, 11.027]  // Oxyzone coordinates (Placeholder, replace with actual coordinates)
+        },
+        "properties": {
+          "name": "Oxyzone",
+          "message": "PARKING DETAILS:<br>TOTAL PARKING SLOTS:15<br>FACILITIES:Tea/Coffee,Snacks,CoolDrinks<br>TO BOOK SLOTS:"
+        }
+      },
+      // Add more features as needed
+    ]
   };
 
-  // Initialize Firebase
-     const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-	    const auth = getAuth();
-	    console.log(app);
+  L.geoJSON(placesGeoJSON, {
+    onEachFeature: function (feature, layer) {
+      if (feature.geometry.type === 'Point') {
+        layer.bindPopup('<b>' + feature.properties.name + '</b><br>' + feature.properties.message);
+      }
+    }
+  }).addTo(map);
 
-	  
+  // Function to create a custom marker with label
+  function createCustomMarker(latlng, label) {
+    return L.marker(latlng, {
+      icon: L.divIcon({
+        className: 'label',
+        html: label,
+        iconSize: [80, 30],
+        iconAnchor: [40, 15]
+      })
+    });
+  }
 
-	  //----- New Registration code start	  
-	  document.getElementById("register").addEventListener("click", function() {
-		  var email =  document.getElementById("email").value;
-		  var password = document.getElementById("password").value;
-		  //For new registration
-		  createUserWithEmailAndPassword(auth, email, password)
-		  .then((userCredential) => {
-		    // Signed in 
-		    const user = userCredential.user;
-		    console.log(user);
-		    alert("Signup successfully!!");
-		    // ...
-		  })
-		  .catch((error) => {
-		    const errorCode = error.code;
-		    const errorMessage = error.message;
-		    // ..
-		    console.log(errorMessage);
-		    alert(error);
-		  });		  		  
-	  });
-	  //----- End
+  // Main Zone Layer
+  var mainZoneLayer = L.geoJSON(placesGeoJSON, {
+    filter: function (feature) {
+      return feature.geometry.type === 'Point' && ["Ukkadam", "Peelamedu", "Saravanampatti"].includes(feature.properties.name);
+    },
+    pointToLayer: function (feature, latlng) {
+      return createCustomMarker(latlng, feature.properties.name);
+    }
+  }).addTo(map);
 
-	  //----- Login code start	  
-	  document.getElementById("login").addEventListener("click", function() {
-		  var email =  document.getElementById("login_email").value;
-		  var password = document.getElementById("login_password").value;
+  // Subzone Layer (Initially Empty)
+  var subZoneLayer = L.geoJSON(null);
 
-		  signInWithEmailAndPassword(auth, email, password)
-		  .then((userCredential) => {
-		    // Signed in 
-		    const user = userCredential.user;
-		    console.log(user);
-		    alert(user.email+" Login successfully!!!");    
-			
-			///<a href="http://127.0.0.1:5500/index.html"></a>
-		    document.getElementById('logout').style.display = 'block';
-			//window.location.href = 'http://127.0.0.1:5500/index.html';
-			//href="http://127.0.0.1:5500/index.html";
-			//window.location.href = 'http://127.0.0.1:5500/index.html';
-		    // ...href for login suc
-			// <button type="button" id="login" name="login" class="btn btn-success" onclick="http://127.0.0.1:5500/index.html">Login</button>
-			
+  // Click event on mainZoneLayer
+  mainZoneLayer.on('click', function (event) {
+    var clickedZone = event.layer.feature.properties.name;
 
-		  })
-		  .catch((error) => {
-		    const errorCode = error.code;
-		    const errorMessage = error.message;
-		    console.log(errorMessage);
-		    alert(errorMessage);
-		  });		  		  
-	  });
-	  //----- End
+    // Set the map view to include the main zone feature only
+    map.setView(event.layer.getLatLng(), 14);
 
-	  //----- Logout code start	  
-	  document.getElementById("logout").addEventListener("click", function() {
-		  signOut(auth).then(() => {
-			  // Sign-out successful.
-			  console.log('Sign-out successful.');
-			  alert('Sign-out successful.');
-			  document.getElementById('logout').style.display = 'none';
-			}).catch((error) => {
-			  // An error happened.
-			  console.log('An error happened.');
-			  //window.location.href = 'http://127.0.0.1:5500/index.html';
-			});		  		  
-			//window.location.href = 'http://127.0.0.1:5500/index.html';
-	  });
-	  //----- End
+    // Remove existing subZoneLayer if exists
+    if (map.hasLayer(subZoneLayer)) {
+      map.removeLayer(subZoneLayer);
+    }
 
-	</script>
+    // Create new Subzone Layer
+    subZoneLayer = L.geoJSON(placesGeoJSON, {
+      filter: function (subzone) {
+        return subzone.properties.name.includes(clickedZone) && subzone.geometry.type === 'Point';
+      },
+      onEachFeature: function (subfeature, sublayer) {
+        sublayer.bindPopup('<b>' + subfeature.properties.name + '</b><br>' + subfeature.properties.message);
+      }
+    }).addTo(map);
+  });
+
+</script>
+
+</body>
 </html>
